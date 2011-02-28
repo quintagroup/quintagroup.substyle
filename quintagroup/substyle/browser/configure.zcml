@@ -5,10 +5,16 @@
 
     <adapter factory=".folder.SetStyleAdapter" />
     <browser:page
-      for="Products.ATContentTypes.interface.IATFolder"
-      name="set_style"
-      class=".folder.SetStyleForm"
-      permission="zope2.ManageProperties"
-      />
-
+        for="Products.ATContentTypes.interface.IATFolder"
+        name="set_style"
+        class=".folder.SetStyleForm"
+        permission="zope2.ManageProperties"
+        />
+    <browser:page
+        for="*"
+        name="local.css"
+        class=".folder.LocalCSS"
+        permission="zope2.View"
+        attribute="css"
+        />
 </configure>
