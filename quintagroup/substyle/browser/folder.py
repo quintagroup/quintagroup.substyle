@@ -70,10 +70,14 @@ class SetStyleAdapter(SchemaAdapterBase):
 
             def set_prop(x, value, prop=i):
                 context = x.context
-                if not context.hasProperty(prop):
-                    context.manage_addProperty(prop, value, 'string')
+                if value:
+                    if not context.hasProperty(prop):
+                        context.manage_addProperty(prop, value, 'string')
+                    else:
+                        context.manage_changeProperties(**{prop:value})
                 else:
-                    context.manage_changeProperties(**{prop:value})
+                    if context.hasProperty(prop):
+                        context.manage_delProperties([prop,])
 
             setattr(SetStyleAdapter, i, property(get_prop, set_prop))
         super(SetStyleAdapter, self).__init__(context)
@@ -116,7 +120,10 @@ class LocalCSS(BrowserView):
         """
         context = aq_inner(self.context)
         localStyleData={}
-        PROPERTIES = ['backgroundcolor', 'backgroundcontentcolor', 'backgroundhovercolor']
+        PROPERTIES = ['backgroundcolor']
+        portal_properties = getToolByName(context, 'portal_properties')
+        site_properties = getattr(portal_properties, 'site_properties')
+        PROPERTIES.extend(site_properties.getProperty('customsubslyles',[]))
         defaultImgId = "limage.jpg"
         contextImgId = 'top-image.jpg'
 
