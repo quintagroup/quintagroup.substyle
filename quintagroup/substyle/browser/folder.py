@@ -30,6 +30,16 @@ PROPERTIES = {
     'backgroundhovercolor' :    'Background Hover Color',
     }
 
+def IdTitleDesc(value):
+    """ Convert value(id:title:description) to id, title and description
+    """
+    values = value.split(":")
+    if len(values) == 1:
+        return value, value, value
+    elif len(values) == 2:
+        return values[0], values[1], values[1]
+    elif len(values) == 3:
+        return values[0], values[1], values[2]
 
 class ISetStyleSchema(Interface):
     backgroundcolor = schema.TextLine(
@@ -60,7 +70,8 @@ class SetStyleAdapter(SchemaAdapterBase):
         portal_properties = getToolByName(context, 'portal_properties')
         site_properties = getattr(portal_properties, 'site_properties')
         self.customsubslyles = site_properties.getProperty('customsubslyles',[])
-        for i in self.customsubslyles:
+        for v in self.customsubslyles:
+            i, j, k = IdTitleDesc(v)
             def get_prop(x, prop=i):
                 context = x.context
                 if context.hasProperty(prop):
@@ -94,15 +105,14 @@ class SetStyleForm(EditForm):
         site_properties = getattr(portal_properties, 'site_properties')
         self.customsubslyles = site_properties.getProperty('customsubslyles',[])
         customsubslylesdict = []
-        for i in self.customsubslyles:
-            customsubslylesdict.append(schema.TextLine(title=_(i),
-                    description=_(u"This value is directly inserted into css styles, so "
-                       "be careful and enter valid css colour."),
+        for v in self.customsubslyles:
+            i, j, k = IdTitleDesc(v)
+            customsubslylesdict.append(schema.TextLine(title=_(j),
+                    description=_(k),
                     __name__=i,
                     required=False,))
-            setattr(ISetStyleSchema, i, schema.TextLine(title=_(i),
-                    description=_(u"This value is directly inserted into css styles, so "
-                       "be careful and enter valid css colour."),
+            setattr(ISetStyleSchema, i, schema.TextLine(title=_(j),
+                    description=_(k),
                     __name__=i,
                     required=False,))
         for i in customsubslylesdict:
@@ -123,7 +133,8 @@ class LocalCSS(BrowserView):
         PROPERTIES = ['backgroundcolor']
         portal_properties = getToolByName(context, 'portal_properties')
         site_properties = getattr(portal_properties, 'site_properties')
-        PROPERTIES.extend(site_properties.getProperty('customsubslyles',[]))
+        PROPERTIES.extend([IdTitleDesc(i)[0]
+                          for i in site_properties.getProperty('customsubslyles',[]) if i])
         defaultImgId = "limage.jpg"
         contextImgId = 'top-image.jpg'
 
