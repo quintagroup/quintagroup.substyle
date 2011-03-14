@@ -1,34 +1,20 @@
-from zope.interface import Interface
-from zope.component import adapts
-from zope.interface import implements
-from zope import schema
-from zope.formlib import form
-
+from Acquisition import aq_inner
 from plone.app.form.base import EditForm
-from plone.app.controlpanel.form import ControlPanelForm
-
+from Products.ATContentTypes.interface import IATFolder
+from Products.Five.browser import BrowserView
 from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.formlib.schema import SchemaAdapterBase
 from Products.CMFDefault.formlib.schema import ProxyFieldProperty
-from Products.CMFPlone.interfaces import IPloneSiteRoot
-from Products.ATContentTypes.interface import IATContentType
-
-from Products.ATContentTypes.interface import IATFolder
-
+from zope import schema
+from zope.component import adapts
 from zope.i18nmessageid import MessageFactory
+from zope.interface import Interface
+from zope.interface import implements
+from zope.formlib import form
 
 PROJECT_NAME = 'quintagroup.substyle'
 
-_ = qMessageFactory = MessageFactory(PROJECT_NAME)
-
-from Products.Five.browser import BrowserView
-from Acquisition import aq_inner
-
-PROPERTIES = {
-    'backgroundcolor' :  'Background Color',
-    'backgroundcontentcolor' :    'Background Content Color',
-    'backgroundhovercolor' :    'Background Hover Color',
-    }
+_ = MessageFactory(PROJECT_NAME)
 
 def IdTitleDesc(value):
     """ Convert value(id:title:description) to id, title and description
@@ -41,25 +27,9 @@ def IdTitleDesc(value):
     elif len(values) == 3:
         return values[0], values[1], values[2]
 
+
 class ISetStyleSchema(Interface):
-    backgroundcolor = schema.TextLine(
-        title=_(u'Background Color'),
-        description=_(u"This value is directly inserted into css styles, so "
-                       "be careful and enter valid css colour."),
-        required=False,
-        )
-    #backgroundcontentcolor = schema.TextLine(
-        #title=_(u'Background Content Color'),
-        #description=_(u"This value is directly inserted into css styles, so "
-                       #"be careful and enter valid css colour."),
-        #required=False,
-        #)
-    #backgroundhovercolor = schema.TextLine(
-        #title=_(u'Background Hover Color'),
-        #description=_(u"This value is directly inserted into css styles, so "
-                       #"be careful and enter valid css colour."),
-        #required=False,
-        #)
+    pass
 
 
 class SetStyleAdapter(SchemaAdapterBase):
@@ -93,12 +63,10 @@ class SetStyleAdapter(SchemaAdapterBase):
             setattr(SetStyleAdapter, i, property(get_prop, set_prop))
         super(SetStyleAdapter, self).__init__(context)
 
-    backgroundcolor = ProxyFieldProperty(ISetStyleSchema['backgroundcolor'])
-
 
 class SetStyleForm(EditForm):
     label = _("Edit style form")
-    description = _("This form is for managing colour for current folder.")
+    description = _("This form is for managing styles for current folder.")
 
     def __init__(self, context, *a, **b):
         portal_properties = getToolByName(context, 'portal_properties')
@@ -130,20 +98,9 @@ class LocalCSS(BrowserView):
         """
         context = aq_inner(self.context)
         localStyleData={}
-        PROPERTIES = ['backgroundcolor']
         portal_properties = getToolByName(context, 'portal_properties')
         site_properties = getattr(portal_properties, 'site_properties')
-        PROPERTIES.extend([IdTitleDesc(i)[0]
-                          for i in site_properties.getProperty('customsubslyles',[]) if i])
-        defaultImgId = "limage.jpg"
-        contextImgId = 'top-image.jpg'
-
-        image_path = '/'.join([context.portal_url(), defaultImgId])
-        top_image = getattr(context, contextImgId, None)
-        if top_image:
-            image_path = top_image.absolute_url()
-        localStyleData['topliningImg'] = 'url(%s)' % image_path
-
+        PROPERTIES = [IdTitleDesc(i)[0] for i in site_properties.getProperty('customsubslyles',[]) if i]
         for prop in PROPERTIES:
             prop_value = getattr(context, prop, None)
             if prop_value:
@@ -154,26 +111,14 @@ class LocalCSS(BrowserView):
 
     def css(self):
         """css view
-        """
-        css_map = {
-            'backgroundcolor':"""
+            'backgroundcolor':'
 .documentFirstHeading {background-color:%(backgroundcolor)s;}
 .standalone, .documentEditable * .standalone {background-color:%(backgroundcolor)s;}
 form.searchPage input.searchButton {background:%(backgroundcolor)s;}
 #portal-footer {background-color:%(backgroundcolor)s;}
 #portal-top {background-color:%(backgroundcolor)s;}
-            """,
-            'backgroundhovercolor':"""
-.navTreeLevel1 .navTreeItem a:hover span {color:%(backgroundhovercolor)s;border-color:%(backgroundhovercolor)s;}
-.navTreeLevel1 a.navTreeCurrentItem span {color:%(backgroundhovercolor)s;border-color:%(backgroundhovercolor)s;}
-a {color:%(backgroundhovercolor)s;}
-            """,
-            'backgroundcontentcolor':"""
-#visual-portal-wrapper {background-color:%(backgroundcontentcolor)s;}
-.fieldRequired {color:%(backgroundcontentcolor)s;}
-#content {background-color:%(backgroundcontentcolor)s;}
-.portletHeader {background-color:%(backgroundcontentcolor)s;}
-            """,
-            }
+            ',
+        """
+        css_map = {}
 
         return ' '.join([v % self.getLocalStyleData() for k, v in css_map.items() if self.getLocalStyleData()[k]])
