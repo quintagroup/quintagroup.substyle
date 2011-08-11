@@ -68,6 +68,12 @@ class SetStyleForm(EditForm):
     label = _("Edit style form")
     description = _("This form is for managing styles for current folder.")
 
+    def update(self):
+        super(SetStyleForm, self).update()
+        portal_properties = getToolByName(context, 'portal_properties')
+        site_properties = getattr(portal_properties, 'site_properties')
+        return site_properties.getProperty('subslyleshelp',"")
+
     def __init__(self, context, *a, **b):
         portal_properties = getToolByName(context, 'portal_properties')
         site_properties = getattr(portal_properties, 'site_properties')
