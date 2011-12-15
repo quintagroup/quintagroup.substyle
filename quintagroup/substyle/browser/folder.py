@@ -16,6 +16,7 @@ PROJECT_NAME = 'quintagroup.substyle'
 
 _ = MessageFactory(PROJECT_NAME)
 
+
 def IdTitleDesc(value):
     """ Convert value(id:title:description) to id, title and description
     """
@@ -38,10 +39,11 @@ class SetStyleAdapter(SchemaAdapterBase):
 
     def __init__(self, context):
         portal_properties = getToolByName(context, 'portal_properties')
-        site_properties = getattr(portal_properties, 'site_properties')
-        self.customsubslyles = site_properties.getProperty('customsubslyles',[])
+        site_props = getattr(portal_properties, 'site_properties')
+        self.customsubslyles = site_props.getProperty('customsubstyles', [])
         for v in self.customsubslyles:
             i, j, k = IdTitleDesc(v)
+
             def get_prop(x, prop=i):
                 context = x.context
                 if context.hasProperty(prop):
@@ -55,10 +57,10 @@ class SetStyleAdapter(SchemaAdapterBase):
                     if not context.hasProperty(prop):
                         context.manage_addProperty(prop, value, 'string')
                     else:
-                        context.manage_changeProperties(**{prop:value})
+                        context.manage_changeProperties(**{prop: value})
                 else:
                     if context.hasProperty(prop):
-                        context.manage_delProperties([prop,])
+                        context.manage_delProperties([prop, ])
 
             setattr(SetStyleAdapter, i, property(get_prop, set_prop))
         super(SetStyleAdapter, self).__init__(context)
@@ -70,9 +72,9 @@ class SetStyleForm(EditForm):
 
     def __init__(self, context, *a, **b):
         portal_properties = getToolByName(context, 'portal_properties')
-        site_properties = getattr(portal_properties, 'site_properties')
-        self.customsubslyles = site_properties.getProperty('customsubslyles',[])
-        self.status = site_properties.getProperty('subslyleshelp',None)
+        site_props = getattr(portal_properties, 'site_properties')
+        self.customsubslyles = site_props.getProperty('customsubstyles', [])
+        self.status = site_properties.getProperty('substyleshelp', None)
         customsubslylesdict = []
         for v in self.customsubslyles:
             i, j, k = IdTitleDesc(v)
@@ -86,7 +88,8 @@ class SetStyleForm(EditForm):
                     required=False,))
         for i in customsubslylesdict:
             i.interface = ISetStyleSchema
-        self.form_fields = form.FormFields(ISetStyleSchema) + form.FormFields(*customsubslylesdict)
+        self.form_fields = form.FormFields(ISetStyleSchema) +\
+                           form.FormFields(*customsubslylesdict)
         super(SetStyleForm, self).__init__(context, *a, **b)
 
 
@@ -98,10 +101,12 @@ class LocalCSS(BrowserView):
         """Get local style data
         """
         context = aq_inner(self.context)
-        localStyleData={}
+        localStyleData = {}
         portal_properties = getToolByName(context, 'portal_properties')
-        site_properties = getattr(portal_properties, 'site_properties')
-        PROPERTIES = [IdTitleDesc(i)[0] for i in site_properties.getProperty('customsubslyles',[]) if i]
+        site_props = getattr(portal_properties, 'site_properties')
+        PROPERTIES = [IdTitleDesc(i)[0]
+                      for i in site_props.getProperty('customsubslyles', [])
+                      if i]
         for prop in PROPERTIES:
             prop_value = getattr(context, prop, None)
             if prop_value:
@@ -114,7 +119,7 @@ class LocalCSS(BrowserView):
         """css view
             'backgroundcolor':'
 .documentFirstHeading {background-color:%(backgroundcolor)s;}
-.standalone, .documentEditable * .standalone {background-color:%(backgroundcolor)s;}
+.documentEditable * .standalone {background-color:%(backgroundcolor)s;}
 form.searchPage input.searchButton {background:%(backgroundcolor)s;}
 #portal-footer {background-color:%(backgroundcolor)s;}
 #portal-top {background-color:%(backgroundcolor)s;}
@@ -122,4 +127,6 @@ form.searchPage input.searchButton {background:%(backgroundcolor)s;}
         """
         css_map = {}
 
-        return ' '.join([v % self.getLocalStyleData() for k, v in css_map.items() if self.getLocalStyleData()[k]])
+        return ' '.join([v % self.getLocalStyleData()
+                         for k, v in css_map.items()
+                         if self.getLocalStyleData()[k]])
