@@ -74,7 +74,7 @@ class SetStyleForm(EditForm):
         portal_properties = getToolByName(context, 'portal_properties')
         site_props = getattr(portal_properties, 'site_properties')
         self.customsubslyles = site_props.getProperty('customsubstyles', [])
-        self.status = site_properties.getProperty('substyleshelp', None)
+        self.status = site_props.getProperty('substyleshelp', None)
         customsubslylesdict = []
         for v in self.customsubslyles:
             i, j, k = IdTitleDesc(v)
