@@ -1,6 +1,6 @@
 from Acquisition import aq_inner
 from plone.app.form.base import EditForm
-from Products.ATContentTypes.interface import IATFolder
+from Products.ATContentTypes.interface import IATContentType
 from Products.Five.browser import BrowserView
 from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.formlib.schema import SchemaAdapterBase
@@ -34,7 +34,7 @@ class ISetStyleSchema(Interface):
 
 
 class SetStyleAdapter(SchemaAdapterBase):
-    adapts(IATFolder)
+    adapts(IATContentType)
     implements(ISetStyleSchema)
 
     def __init__(self, context):
@@ -68,7 +68,7 @@ class SetStyleAdapter(SchemaAdapterBase):
 
 class SetStyleForm(EditForm):
     label = _("Edit style form")
-    description = _("This form is for managing styles for current folder.")
+    description = _("This form is for managing styles for current item.")
 
     def __init__(self, context, *a, **b):
         portal_properties = getToolByName(context, 'portal_properties')
