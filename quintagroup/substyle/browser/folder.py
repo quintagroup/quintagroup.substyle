@@ -4,7 +4,6 @@ from Products.ATContentTypes.interface import IATContentType
 from Products.Five.browser import BrowserView
 from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.formlib.schema import SchemaAdapterBase
-from Products.CMFDefault.formlib.schema import ProxyFieldProperty
 from zope import schema
 from zope.component import adapts
 from zope.i18nmessageid import MessageFactory
@@ -79,9 +78,9 @@ class SetStyleForm(EditForm):
         for v in self.customsubslyles:
             i, j, k = IdTitleDesc(v)
             customsubslylesdict.append(schema.TextLine(title=_(j),
-                    description=_(k),
-                    __name__=i,
-                    required=False,))
+                                                       description=_(k),
+                                                       __name__=i,
+                                                       required=False,))
             setattr(ISetStyleSchema, i, schema.TextLine(title=_(j),
                     description=_(k),
                     __name__=i,
@@ -89,7 +88,7 @@ class SetStyleForm(EditForm):
         for i in customsubslylesdict:
             i.interface = ISetStyleSchema
         self.form_fields = form.FormFields(ISetStyleSchema) +\
-                           form.FormFields(*customsubslylesdict)
+            form.FormFields(*customsubslylesdict)
         super(SetStyleForm, self).__init__(context, *a, **b)
 
 
