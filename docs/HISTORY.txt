@@ -1,14 +1,20 @@
 Changelog
 =========
 
+1.2 (unreleased)
+----------------
+
+- set style for all ATContentTypes
+
+
 1.1.1 (unreleased)
--------------------
+------------------
 
 - typo fixed
 
 
 1.1 (unreleased)
--------------------
+----------------
 
 - Fixed variables names
 
@@ -16,6 +22,6 @@ Changelog
 
 
 1.0 (unreleased)
--------------------
+----------------
 
 - Initial release

@@ -1,3 +1,4 @@
 Introduction
 ============
-readme inside package
+
+Styles for site subsections.
