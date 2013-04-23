@@ -5,7 +5,6 @@ version = '1.2'
 
 test_require = [
     'plone.app.testing',
-    'plone.testing',
     'selenium',
 ]
 
