@@ -3,6 +3,11 @@ import os
 
 version = '1.2'
 
+test_require = [
+    'plone.app.testing',
+    'selenium',
+]
+
 setup(name='quintagroup.substyle',
       version=version,
       description="Styles for site subsections",
@@ -39,6 +44,7 @@ setup(name='quintagroup.substyle',
           'setuptools',
           # -*- Extra requirements: -*-
       ],
+      extras_require={'tests': test_require, },
       entry_points="""
       # -*- Entry points: -*-
 
