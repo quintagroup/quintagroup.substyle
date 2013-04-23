@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 import unittest
+import os
+import sys
+import new
+from random import randint
+import base64
+import json
+import httplib
+from selenium import webdriver
 
 from plone.testing import z2
 from plone.app.testing import applyProfile
@@ -10,7 +18,6 @@ from plone.app.testing.interfaces import (PLONE_SITE_ID,
                                           SITE_OWNER_NAME,
                                           SITE_OWNER_PASSWORD)
 from zope.configuration import xmlconfig
-from selenium.webdriver.firefox.webdriver import WebDriver
 
 
 class Substyle(PloneSandboxLayer):
@@ -33,22 +40,48 @@ class Substyle(PloneSandboxLayer):
 
 SUBSTYLE_FIXTURE = Substyle()
 
-EMBEDLY_ACCEPTANCE_TESTING = FunctionalTesting(
+SUBSTYLE_ACCEPTANCE_TESTING = FunctionalTesting(
     bases=(SUBSTYLE_FIXTURE, z2.ZSERVER_FIXTURE),
     name="Substyle:Acceptance")
 
 
-class TestConfiglet(unittest.TestCase):
-    layer = EMBEDLY_ACCEPTANCE_TESTING
+class TestSubstyle(unittest.TestCase):
+    layer = SUBSTYLE_ACCEPTANCE_TESTING
+
+    __test__ = False
 
     def setUp(self):
-        self.wd = WebDriver()
+        self.caps['name'] = 'quintagroup.substyle'
+        if os.environ.get('TRAVIS'):
+            self.caps['tunnel-identifier'] = os.environ['TRAVIS_JOB_NUMBER']
+            self.caps['build'] = os.environ['TRAVIS_BUILD_NUMBER']
+            self.caps['tags'] = [os.environ['TRAVIS_PYTHON_VERSION'], os.environ['PLONE'], 'CI']
+
+        self.username = os.environ['SAUCE_USERNAME']
+        self.key = os.environ['SAUCE_ACCESS_KEY']
+        hub_url = "%s:%s@ondemand.saucelabs.com:80" % (self.username, self.key)
+        self.wd = webdriver.Remote(desired_capabilities=self.caps,
+                                   command_executor="http://%s/wd/hub" % hub_url)
+        self.jobid = self.wd.session_id
         self.wd.implicitly_wait(30)
+
+    def report_test_result(self):
+        base64string = base64.encodestring('%s:%s'
+                                           % (self.username, self.key))[:-1]
+        result = json.dumps({'passed': sys.exc_info() == (None, None, None)})
+        connection = httplib.HTTPConnection("saucelabs.com")
+        connection.request('PUT',
+                           '/rest/v1/%s/jobs/%s' % (self.username, self.jobid),
+                           result,
+                           headers={"Authorization": "Basic %s" % base64string})
+        result = connection.getresponse()
+        return result.status == 200
 
     def tearDown(self):
         self.wd.quit()
+        self.report_test_result()
 
-    def test_test3(self):
+    def test_substyle(self):
         success = True
         wd = self.wd
         plone_url = "http://localhost:55001/%s" % PLONE_SITE_ID
@@ -116,30 +149,28 @@ class TestConfiglet(unittest.TestCase):
         self.assertTrue(success)
 
 
+PLATFORMS = [
+    {
+        'browserName': 'firefox',
+    },
+    {
+        'browserName': 'chrome',
+    },
+]
+
+
 def test_suite():
-    return unittest.TestSuite([
-        unittest.makeSuite(TestConfiglet),
-
-        # Unit tests
-        # doctestunit.DocFileSuite(
-        #    'README.txt', package='quintagroup.substyle',
-        #    setUp=testing.setUp, tearDown=testing.tearDown),
-
-        # doctestunit.DocTestSuite(
-        #    module='quintagroup.substyle.mymodule',
-        #    setUp=testing.setUp, tearDown=testing.tearDown),
-
-
-        # Integration tests that use PloneTestCase
-        # ztc.ZopeDocFileSuite(
-        #    'README.txt', package='quintagroup.substyle',
-        #    test_class=TestCase),
-
-        # ztc.FunctionalDocFileSuite(
-        #    'browser.txt', package='quintagroup.substyle',
-        #    test_class=TestCase),
-
-    ])
+    suite = unittest.TestSuite()
+    for platform in PLATFORMS:
+        d = dict(TestSubstyle.__dict__)
+        name = "%s_%s_%s_%s" % (TestSubstyle.__name__,
+                                platform['browserName'],
+                                platform.get('platform', 'ANY'),
+                                randint(0, 999))
+        name = name.replace(" ", "").replace(".", "")
+        d.update({'__test__': True, 'caps': platform})
+        suite.addTest(unittest.makeSuite(new.classobj(name, (TestSubstyle,), d)))
+    return suite
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
