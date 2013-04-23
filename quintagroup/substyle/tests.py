@@ -43,7 +43,7 @@ class TestConfiglet(unittest.TestCase):
 
     def setUp(self):
         self.wd = WebDriver()
-        self.wd.implicitly_wait(10)
+        self.wd.implicitly_wait(30)
 
     def tearDown(self):
         self.wd.quit()
@@ -51,8 +51,8 @@ class TestConfiglet(unittest.TestCase):
     def test_test3(self):
         success = True
         wd = self.wd
-        page_url = "http://localhost:55001/%s" % PLONE_SITE_ID
-        wd.get(page_url)
+        plone_url = "http://localhost:55001/%s" % PLONE_SITE_ID
+        wd.get(plone_url)
         wd.find_element_by_id("personaltools-login").click()
         wd.find_element_by_id("__ac_name").click()
         wd.find_element_by_id("__ac_name").clear()
@@ -68,6 +68,7 @@ class TestConfiglet(unittest.TestCase):
             "portal_properties (General settings registry)").click()
         wd.find_element_by_link_text(
             "site_properties (Site wide properties)").click()
+        site_properties_url = wd.current_url
         wd.find_element_by_name("id:string").click()
         wd.find_element_by_name("id:string").clear()
         wd.find_element_by_name("id:string").send_keys("customsubstyles")
@@ -80,7 +81,7 @@ class TestConfiglet(unittest.TestCase):
         wd.find_element_by_name("customsubstyles:lines").send_keys(
             "style_id:style_title:style_description")
         wd.find_element_by_name("manage_editProperties:method").click()
-        wd.get(page_url)
+        wd.get(plone_url)
         wd.find_element_by_xpath(
             "//dl[@id='plone-contentmenu-factories']//span[.='Add new…']").click()
         wd.find_element_by_xpath("//a[@id='document']//span[.='Page']").click()
@@ -100,13 +101,7 @@ class TestConfiglet(unittest.TestCase):
         wd.find_element_by_id("form.style_id").clear()
         wd.find_element_by_id("form.style_id").send_keys("test")
         wd.find_element_by_id("form.actions.save").click()
-        wd.find_element_by_id("user-name").click()
-        wd.find_element_by_link_text("Site Setup").click()
-        wd.find_element_by_link_text("Zope Management Interface").click()
-        wd.find_element_by_link_text(
-            "portal_properties (General settings registry)").click()
-        wd.find_element_by_link_text(
-            "site_properties (Site wide properties)").click()
+        wd.get(site_properties_url)
         wd.find_element_by_name("customsubstyles:lines").click()
         wd.find_element_by_name("customsubstyles:lines").clear()
         wd.find_element_by_name("customsubstyles:lines").send_keys(
