@@ -51,7 +51,7 @@ class TestConfiglet(unittest.TestCase):
     def test_test3(self):
         success = True
         wd = self.wd
-        page_url = "http://localhost:55001/%d" % PLONE_SITE_ID
+        page_url = "http://localhost:55001/%s" % PLONE_SITE_ID
         wd.get(page_url)
         wd.find_element_by_id("personaltools-login").click()
         wd.find_element_by_id("__ac_name").click()
