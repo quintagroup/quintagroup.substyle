@@ -129,13 +129,7 @@ class TestSubstyle(unittest.TestCase):
         # set substylestemplate
         wd.find_element_by_name("substylestemplate:string").click()
         wd.find_element_by_name("substylestemplate:string").clear()
-        wd.find_element_by_name("substylestemplate:string").send_keys("""
-.documentFirstHeading {background-color: $backgroundcolor;}
-.documentEditable * .standalone {background-color: $backgroundcolor;}
-form.searchPage input.searchButton {background: $backgroundcolor;}
-#portal-footer {background-color: $backgroundcolor;}
-#portal-top {background-color: $backgroundcolor;}
-""")
+        wd.find_element_by_name("substylestemplate:string").send_keys(".documentFirstHeading {background-color: $backgroundcolor;}\n#portal-top {background-color: $backgroundcolor;}")
         # set substyleshelp
         wd.find_element_by_name("substyleshelp:string").click()
         wd.find_element_by_name("substyleshelp:string").clear()
