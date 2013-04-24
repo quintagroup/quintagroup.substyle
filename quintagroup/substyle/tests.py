@@ -85,6 +85,7 @@ class TestSubstyle(unittest.TestCase):
         success = True
         wd = self.wd
         plone_url = "http://localhost:55001/%s" % PLONE_SITE_ID
+        site_properties_url = "%s/portal_properties/site_properties/manage_propertiesForm" % plone_url
         wd.get(plone_url)
         wd.find_element_by_id("personaltools-login").click()
         wd.find_element_by_id("__ac_name").click()
@@ -94,14 +95,7 @@ class TestSubstyle(unittest.TestCase):
         wd.find_element_by_id("__ac_password").clear()
         wd.find_element_by_id("__ac_password").send_keys(SITE_OWNER_PASSWORD)
         wd.find_element_by_name("submit").click()
-        wd.find_element_by_id("user-name").click()
-        wd.find_element_by_link_text("Site Setup").click()
-        wd.find_element_by_link_text("Zope Management Interface").click()
-        wd.find_element_by_link_text(
-            "portal_properties (General settings registry)").click()
-        wd.find_element_by_link_text(
-            "site_properties (Site wide properties)").click()
-        site_properties_url = wd.current_url
+        wd.get(site_properties_url)
         wd.find_element_by_name("id:string").click()
         wd.find_element_by_name("id:string").clear()
         wd.find_element_by_name("id:string").send_keys("customsubstyles")
