@@ -2,7 +2,7 @@ Changelog
 =========
 
 1.2.1 (Apr 24, 2013)
-------------------
+--------------------
 
 - fixed documentation [kroman0]
 
