@@ -8,6 +8,7 @@ import base64
 import json
 import httplib
 from selenium import webdriver
+from selenium.webdriver.firefox.webdriver import WebDriver
 
 from plone.testing import z2
 from plone.app.testing import applyProfile
@@ -18,6 +19,7 @@ from plone.app.testing.interfaces import (PLONE_SITE_ID,
                                           SITE_OWNER_NAME,
                                           SITE_OWNER_PASSWORD)
 from zope.configuration import xmlconfig
+from quintagroup.substyle import CUSTOMSUBSTYLES, SUBSTYLESHELP, SUBSTYLESTEMPLATE
 
 
 class Substyle(PloneSandboxLayer):
@@ -59,16 +61,20 @@ class TestSubstyle(unittest.TestCase):
                 "Python %s" % os.environ['TRAVIS_PYTHON_VERSION'],
                 "Plone %s" % os.environ['PLONE'],
             ]
-
-        self.username = os.environ['SAUCE_USERNAME']
-        self.key = os.environ['SAUCE_ACCESS_KEY']
-        hub_url = "%s:%s@ondemand.saucelabs.com:80" % (self.username, self.key)
-        self.wd = webdriver.Remote(desired_capabilities=self.caps,
-                                   command_executor="http://%s/wd/hub" % hub_url)
-        self.jobid = self.wd.session_id
+            self.username = os.environ['SAUCE_USERNAME']
+            self.key = os.environ['SAUCE_ACCESS_KEY']
+            hub_url = "%s:%s@ondemand.saucelabs.com:80" % (self.username, self.key)
+            self.wd = webdriver.Remote(desired_capabilities=self.caps,
+                                       command_executor="http://%s/wd/hub" % hub_url)
+            self.jobid = self.wd.session_id
+        else:
+            self.wd = WebDriver()
+            self.jobid = 0
         self.wd.implicitly_wait(30)
 
     def report_test_result(self):
+        if not self.jobid:
+            return
         base64string = base64.encodestring('%s:%s'
                                            % (self.username, self.key))[:-1]
         result = json.dumps({'passed': sys.exc_info() == (None, None, None)})
@@ -105,23 +111,23 @@ class TestSubstyle(unittest.TestCase):
         # go to site properties form
         wd.get(site_properties_url)
         # add customsubstyles
-        wd.find_element_by_name("id:string").send_keys("customsubstyles")
+        wd.find_element_by_name("id:string").send_keys(CUSTOMSUBSTYLES)
         if not wd.find_element_by_xpath("//form[2]/table/tbody/tr[1]/td[4]/div/select/option[5]").is_selected():
             wd.find_element_by_xpath(
                 "//form[2]/table/tbody/tr[1]/td[4]/div/select/option[5]").click()
         wd.find_element_by_name("submit").click()
         # add substylestemplate
-        wd.find_element_by_name("id:string").send_keys("substylestemplate")
+        wd.find_element_by_name("id:string").send_keys(SUBSTYLESTEMPLATE)
         wd.find_element_by_name("submit").click()
         # add substyleshelp
-        wd.find_element_by_name("id:string").send_keys("substyleshelp")
+        wd.find_element_by_name("id:string").send_keys(SUBSTYLESHELP)
         wd.find_element_by_name("submit").click()
         # set customsubstyles
-        wd.find_element_by_name("customsubstyles:lines").send_keys("backgroundcolor:Background color:background color")
+        wd.find_element_by_name(CUSTOMSUBSTYLES + ":lines").send_keys("backgroundcolor:Background color:background color")
         # set substylestemplate
-        wd.find_element_by_name("substylestemplate:string").send_keys(".documentFirstHeading {background-color: $backgroundcolor;}\n#portal-top {background-color: $backgroundcolor;}")
+        wd.find_element_by_name(SUBSTYLESTEMPLATE + ":string").send_keys(".documentFirstHeading {background-color: $backgroundcolor;}\n#portal-top {background-color: $backgroundcolor;}")
         # set substyleshelp
-        wd.find_element_by_name("substyleshelp:string").send_keys("You can change theme colors on different site sections.")
+        wd.find_element_by_name(SUBSTYLESHELP + ":string").send_keys("You can change theme colors on different site sections.")
         wd.find_element_by_name("manage_editProperties:method").click()
         # go to site
         wd.get(plone_url)
@@ -138,17 +144,23 @@ class TestSubstyle(unittest.TestCase):
             print("verifyTextPresent failed")
         wd.find_element_by_id("form.backgroundcolor").send_keys("red")
         wd.find_element_by_id("form.actions.save").click()
+        if "rgba(255, 0, 0, 1)" != wd.find_element_by_class_name("documentFirstHeading").value_of_css_property("background-color"):
+            success = False
+            print("css not found")
         self.assertTrue(success)
 
 
-PLATFORMS = [
-    {
-        'browserName': 'firefox',
-    },
-    {
-        'browserName': 'chrome',
-    },
-]
+if os.environ.get('TRAVIS'):
+    PLATFORMS = [
+        {
+            'browserName': 'firefox',
+        },
+        {
+            'browserName': 'chrome',
+        },
+    ]
+else:
+    PLATFORMS = [{'browserName': 'firefox'}]
 
 
 def test_suite():

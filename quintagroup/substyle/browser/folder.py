@@ -12,6 +12,8 @@ from zope.interface import implements
 from zope.formlib import form
 from string import Template
 
+from quintagroup.substyle import CUSTOMSUBSTYLES, SUBSTYLESHELP, SUBSTYLESTEMPLATE
+
 PROJECT_NAME = 'quintagroup.substyle'
 
 _ = MessageFactory(PROJECT_NAME)
@@ -40,7 +42,7 @@ class SetStyleAdapter(SchemaAdapterBase):
     def __init__(self, context):
         portal_properties = getToolByName(context, 'portal_properties')
         site_props = getattr(portal_properties, 'site_properties')
-        self.customsubslyles = site_props.getProperty('customsubstyles', [])
+        self.customsubslyles = site_props.getProperty(CUSTOMSUBSTYLES, [])
         for v in self.customsubslyles:
             i, j, k = IdTitleDesc(v)
 
@@ -73,8 +75,8 @@ class SetStyleForm(EditForm):
     def __init__(self, context, *a, **b):
         portal_properties = getToolByName(context, 'portal_properties')
         site_props = getattr(portal_properties, 'site_properties')
-        self.customsubslyles = site_props.getProperty('customsubstyles', [])
-        self.status = site_props.getProperty('substyleshelp', None)
+        self.customsubslyles = site_props.getProperty(CUSTOMSUBSTYLES, [])
+        self.status = site_props.getProperty(SUBSTYLESHELP, None)
         customsubslylesdict = []
         for v in self.customsubslyles:
             i, j, k = IdTitleDesc(v)
@@ -109,7 +111,7 @@ class LocalCSS(BrowserView):
         context = aq_inner(self.context)
         localStyleData = {}
         PROPERTIES = [IdTitleDesc(i)[0]
-                      for i in self.site_props.getProperty('customsubslyles', [])
+                      for i in self.site_props.getProperty(CUSTOMSUBSTYLES, [])
                       if i]
         for prop in PROPERTIES:
             prop_value = getattr(context, prop, None)
@@ -122,6 +124,6 @@ class LocalCSS(BrowserView):
     def css(self):
         """css view
         """
-        template = self.site_props.getProperty('subslylestemplate', "")
+        template = self.site_props.getProperty(SUBSTYLESTEMPLATE, "")
         template = Template(template)
         return template.safe_substitute(self.getLocalStyleData())
