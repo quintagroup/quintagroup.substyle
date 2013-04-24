@@ -108,9 +108,6 @@ class TestSubstyle(unittest.TestCase):
         wd.find_element_by_name("id:string").click()
         wd.find_element_by_name("id:string").clear()
         wd.find_element_by_name("id:string").send_keys("customsubstyles")
-        wd.find_element_by_name("value:string").click()
-        wd.find_element_by_name("value:string").clear()
-        wd.find_element_by_name("value:string").send_keys("backgroundcolor:Background color:background color")
         if not wd.find_element_by_xpath("//form[2]/table/tbody/tr[1]/td[4]/div/select/option[5]").is_selected():
             wd.find_element_by_xpath(
                 "//form[2]/table/tbody/tr[1]/td[4]/div/select/option[5]").click()
@@ -119,24 +116,31 @@ class TestSubstyle(unittest.TestCase):
         wd.find_element_by_name("id:string").click()
         wd.find_element_by_name("id:string").clear()
         wd.find_element_by_name("id:string").send_keys("substylestemplate")
-        wd.find_element_by_name("value:string").click()
-        wd.find_element_by_name("value:string").clear()
-        wd.find_element_by_name("value:string").send_keys("""
+        wd.find_element_by_name("submit").click()
+        # add substyleshelp
+        wd.find_element_by_name("id:string").click()
+        wd.find_element_by_name("id:string").clear()
+        wd.find_element_by_name("id:string").send_keys("substyleshelp")
+        wd.find_element_by_name("submit").click()
+        # set customsubstyles
+        wd.find_element_by_name("customsubstyles:lines").click()
+        wd.find_element_by_name("customsubstyles:lines").clear()
+        wd.find_element_by_name("customsubstyles:lines").send_keys("backgroundcolor:Background color:background color")
+        # set substylestemplate
+        wd.find_element_by_name("substylestemplate:string").click()
+        wd.find_element_by_name("substylestemplate:string").clear()
+        wd.find_element_by_name("substylestemplate:string").send_keys("""
 .documentFirstHeading {background-color: $backgroundcolor;}
 .documentEditable * .standalone {background-color: $backgroundcolor;}
 form.searchPage input.searchButton {background: $backgroundcolor;}
 #portal-footer {background-color: $backgroundcolor;}
 #portal-top {background-color: $backgroundcolor;}
 """)
-        wd.find_element_by_name("submit").click()
-        # add substylestemplate
-        wd.find_element_by_name("id:string").click()
-        wd.find_element_by_name("id:string").clear()
-        wd.find_element_by_name("id:string").send_keys("substyleshelp")
-        wd.find_element_by_name("value:string").click()
-        wd.find_element_by_name("value:string").clear()
-        wd.find_element_by_name("value:string").send_keys("You can change theme colors on different site sections.")
-        wd.find_element_by_name("submit").click()
+        # set substyleshelp
+        wd.find_element_by_name("substyleshelp:string").click()
+        wd.find_element_by_name("substyleshelp:string").clear()
+        wd.find_element_by_name("substyleshelp:string").send_keys("You can change theme colors on different site sections.")
+        wd.find_element_by_name("manage_editProperties:method").click()
         # go to site
         wd.get(plone_url)
         # add page
