@@ -11,8 +11,8 @@ test_require = [
 setup(name='quintagroup.substyle',
       version=version,
       description="Styles for site subsections",
-      long_description=open("README.txt").read() + "\n" +
-      open(os.path.join("docs", "HISTORY.txt")).read(),
+      long_description=open("README.md").read() + "\n" +
+      open(os.path.join("docs", "HISTORY.md")).read(),
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
