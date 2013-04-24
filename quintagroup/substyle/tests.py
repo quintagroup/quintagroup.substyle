@@ -55,7 +55,10 @@ class TestSubstyle(unittest.TestCase):
         if os.environ.get('TRAVIS'):
             self.caps['tunnel-identifier'] = os.environ['TRAVIS_JOB_NUMBER']
             self.caps['build'] = os.environ['TRAVIS_BUILD_NUMBER']
-            self.caps['tags'] = [os.environ['TRAVIS_PYTHON_VERSION'], os.environ['PLONE'], 'CI']
+            self.caps['tags'] = [
+                "Python %s" % os.environ['TRAVIS_PYTHON_VERSION'],
+                "Plone %s" % os.environ['PLONE'],
+            ]
 
         self.username = os.environ['SAUCE_USERNAME']
         self.key = os.environ['SAUCE_ACCESS_KEY']
@@ -86,7 +89,9 @@ class TestSubstyle(unittest.TestCase):
         wd = self.wd
         plone_url = "http://localhost:55001/%s" % PLONE_SITE_ID
         site_properties_url = "%s/portal_properties/site_properties/manage_propertiesForm" % plone_url
+        # go to site
         wd.get(plone_url)
+        # login
         wd.find_element_by_id("personaltools-login").click()
         wd.find_element_by_id("__ac_name").click()
         wd.find_element_by_id("__ac_name").clear()
@@ -97,20 +102,44 @@ class TestSubstyle(unittest.TestCase):
         wd.find_element_by_name("submit").click()
         wd.find_element_by_xpath(
             "//dl[@id='plone-contentmenu-factories']//span[.='Add new…']")
+        # go to site properties form
         wd.get(site_properties_url)
+        # add customsubstyles
         wd.find_element_by_name("id:string").click()
         wd.find_element_by_name("id:string").clear()
         wd.find_element_by_name("id:string").send_keys("customsubstyles")
+        wd.find_element_by_name("value:string").click()
+        wd.find_element_by_name("value:string").clear()
+        wd.find_element_by_name("value:string").send_keys("backgroundcolor:Background color:background color")
         if not wd.find_element_by_xpath("//form[2]/table/tbody/tr[1]/td[4]/div/select/option[5]").is_selected():
             wd.find_element_by_xpath(
                 "//form[2]/table/tbody/tr[1]/td[4]/div/select/option[5]").click()
         wd.find_element_by_name("submit").click()
-        wd.find_element_by_name("customsubstyles:lines").click()
-        wd.find_element_by_name("customsubstyles:lines").clear()
-        wd.find_element_by_name("customsubstyles:lines").send_keys(
-            "style_id:style_title:style_description")
-        wd.find_element_by_name("manage_editProperties:method").click()
+        # add substylestemplate
+        wd.find_element_by_name("id:string").click()
+        wd.find_element_by_name("id:string").clear()
+        wd.find_element_by_name("id:string").send_keys("substylestemplate")
+        wd.find_element_by_name("value:string").click()
+        wd.find_element_by_name("value:string").clear()
+        wd.find_element_by_name("value:string").send_keys("""
+.documentFirstHeading {background-color: $backgroundcolor;}
+.documentEditable * .standalone {background-color: $backgroundcolor;}
+form.searchPage input.searchButton {background: $backgroundcolor;}
+#portal-footer {background-color: $backgroundcolor;}
+#portal-top {background-color: $backgroundcolor;}
+""")
+        wd.find_element_by_name("submit").click()
+        # add substylestemplate
+        wd.find_element_by_name("id:string").click()
+        wd.find_element_by_name("id:string").clear()
+        wd.find_element_by_name("id:string").send_keys("substyleshelp")
+        wd.find_element_by_name("value:string").click()
+        wd.find_element_by_name("value:string").clear()
+        wd.find_element_by_name("value:string").send_keys("You can change theme colors on different site sections.")
+        wd.find_element_by_name("submit").click()
+        # go to site
         wd.get(plone_url)
+        # add page
         wd.find_element_by_xpath(
             "//dl[@id='plone-contentmenu-factories']//span[.='Add new…']").click()
         wd.find_element_by_xpath("//a[@id='document']//span[.='Page']").click()
@@ -118,26 +147,11 @@ class TestSubstyle(unittest.TestCase):
         wd.find_element_by_id("title").clear()
         wd.find_element_by_id("title").send_keys("Page")
         wd.find_element_by_name("form.button.save").click()
-        page_url = wd.current_url
+        # set backgroundcolor red
         wd.find_element_by_link_text("Set Style").click()
-        if not ("style_title" in wd.find_element_by_tag_name("html").text):
+        if not ("You can change theme colors on different site sections." in wd.find_element_by_tag_name("html").text):
             success = False
             print("verifyTextPresent failed")
-        if not ("style_description" in wd.find_element_by_tag_name("html").text):
-            success = False
-            print("verifyTextPresent failed")
-        wd.find_element_by_id("form.style_id").click()
-        wd.find_element_by_id("form.style_id").clear()
-        wd.find_element_by_id("form.style_id").send_keys("test")
-        wd.find_element_by_id("form.actions.save").click()
-        wd.get(site_properties_url)
-        wd.find_element_by_name("customsubstyles:lines").click()
-        wd.find_element_by_name("customsubstyles:lines").clear()
-        wd.find_element_by_name("customsubstyles:lines").send_keys(
-            "style_id:style_title:style_description\nbackgroundcolor:background color:background")
-        wd.find_element_by_name("manage_editProperties:method").click()
-        wd.get(page_url)
-        wd.find_element_by_link_text("Set Style").click()
         wd.find_element_by_id("form.backgroundcolor").click()
         wd.find_element_by_id("form.backgroundcolor").clear()
         wd.find_element_by_id("form.backgroundcolor").send_keys("red")
