@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.2'
+version = '1.2.1'
 
 test_require = [
     'plone.app.testing',
@@ -11,8 +11,8 @@ test_require = [
 setup(name='quintagroup.substyle',
       version=version,
       description="Styles for site subsections",
-      long_description=open("README.md").read() + "\n" +
-      open(os.path.join("docs", "HISTORY.md")).read(),
+      long_description=open("README.rst").read() + "\n" +
+      open(os.path.join("docs", "HISTORY.rst")).read(),
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
