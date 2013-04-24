@@ -144,7 +144,7 @@ class TestSubstyle(unittest.TestCase):
             print("verifyTextPresent failed")
         wd.find_element_by_id("form.backgroundcolor").send_keys("red")
         wd.find_element_by_id("form.actions.save").click()
-        if "rgba(255, 0, 0, 1)" != wd.find_element_by_class_name("documentFirstHeading").value_of_css_property("background-color"):
+        if "255, 0, 0" not in wd.find_element_by_class_name("documentFirstHeading").value_of_css_property("background-color"):
             success = False
             print("css not found")
         self.assertTrue(success)
