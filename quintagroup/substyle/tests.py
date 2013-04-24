@@ -95,6 +95,8 @@ class TestSubstyle(unittest.TestCase):
         wd.find_element_by_id("__ac_password").clear()
         wd.find_element_by_id("__ac_password").send_keys(SITE_OWNER_PASSWORD)
         wd.find_element_by_name("submit").click()
+        wd.find_element_by_xpath(
+            "//dl[@id='plone-contentmenu-factories']//span[.='Add new…']")
         wd.get(site_properties_url)
         wd.find_element_by_name("id:string").click()
         wd.find_element_by_name("id:string").clear()
