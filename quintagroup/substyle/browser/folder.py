@@ -10,6 +10,7 @@ from zope.i18nmessageid import MessageFactory
 from zope.interface import Interface
 from zope.interface import implements
 from zope.formlib import form
+from string import Template
 
 PROJECT_NAME = 'quintagroup.substyle'
 
@@ -96,15 +97,19 @@ class LocalCSS(BrowserView):
     """The local.css
     """
 
+    @property
+    def site_props(self):
+        context = aq_inner(self.context)
+        portal_properties = getToolByName(context, 'portal_properties')
+        return getattr(portal_properties, 'site_properties')
+
     def getLocalStyleData(self):
         """Get local style data
         """
         context = aq_inner(self.context)
         localStyleData = {}
-        portal_properties = getToolByName(context, 'portal_properties')
-        site_props = getattr(portal_properties, 'site_properties')
         PROPERTIES = [IdTitleDesc(i)[0]
-                      for i in site_props.getProperty('customsubslyles', [])
+                      for i in self.site_props.getProperty('customsubslyles', [])
                       if i]
         for prop in PROPERTIES:
             prop_value = getattr(context, prop, None)
@@ -116,16 +121,7 @@ class LocalCSS(BrowserView):
 
     def css(self):
         """css view
-            'backgroundcolor':'
-.documentFirstHeading {background-color:%(backgroundcolor)s;}
-.documentEditable * .standalone {background-color:%(backgroundcolor)s;}
-form.searchPage input.searchButton {background:%(backgroundcolor)s;}
-#portal-footer {background-color:%(backgroundcolor)s;}
-#portal-top {background-color:%(backgroundcolor)s;}
-            ',
         """
-        css_map = {}
-
-        return ' '.join([v % self.getLocalStyleData()
-                         for k, v in css_map.items()
-                         if self.getLocalStyleData()[k]])
+        template = self.site_props.getProperty('subslylestemplate', "")
+        template = Template(template)
+        return template.safe_substitute(self.getLocalStyleData())
