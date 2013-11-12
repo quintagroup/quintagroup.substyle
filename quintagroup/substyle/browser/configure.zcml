@@ -5,7 +5,7 @@
 
     <adapter factory=".folder.SetStyleAdapter" />
     <browser:page
-        for="Products.ATContentTypes.interface.IATContentType"
+        for="OFS.interfaces.IPropertyManager"
         name="set_style"
         class=".folder.SetStyleForm"
         permission="zope2.ManageProperties"

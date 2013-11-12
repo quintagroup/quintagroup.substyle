@@ -6,7 +6,7 @@
    <property name="title" i18n:translate="">Set Style</property>
    <property name="description" i18n:translate=""></property>
    <property name="url_expr">string:${object_url}/set_style</property>
-   <property name="available_expr">not:object/@@plone_lock_info/is_locked_for_current_user|python:True</property>
+   <property name="available_expr"></property>
    <property name="permissions">
     <element value="Manage properties"/>
    </property>
