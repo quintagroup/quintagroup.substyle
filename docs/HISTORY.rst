@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.3 (Nov 21, 2013)
+------------------
+
+- Added support all portal types [kroman0]
+
+
 1.2.1 (Apr 24, 2013)
 --------------------
 
